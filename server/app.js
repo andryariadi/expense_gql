@@ -2,6 +2,7 @@ import express from "express";
 import http from "http";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
+import dotenv from "dotenv";
 
 import { ApolloServer } from "@apollo/server";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
@@ -9,7 +10,9 @@ import { expressMiddleware } from "@apollo/server/express4";
 
 import mergedTypeDefs from "./typeDefs/index.js";
 import mergedResolvers from "./resolvers/index.js";
+import connectToMongoDB from "./db/connectDB.js";
 
+dotenv.config();
 const app = express();
 
 const httpServer = http.createServer(app);
@@ -39,12 +42,13 @@ app.use(
   // expressMiddleware accepts the same arguments:
   // an Apollo Server instance and optional configuration options
   expressMiddleware(server, {
-    context: async ({ req }) => ({ token: req.headers.token }),
+    context: async ({ req }) => ({ req }),
   })
 );
 
 // Modified server startup
 await new Promise((resolve) => httpServer.listen({ port: 5000 }, resolve));
+await connectToMongoDB();
 
 console.log(`🚀 Server ready at http://localhost:5000/graphql`);
 
