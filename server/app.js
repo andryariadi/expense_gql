@@ -1,88 +1,118 @@
-import express from "express";
-import http from "http";
-import cors from "cors";
-import rateLimit from "express-rate-limit";
-import dotenv from "dotenv";
-import passport from "passport";
-import session from "express-session";
-import connectMongo from "connect-mongodb-session";
+// Import necessary libraries and modules
+import express from "express"; // Framework for creating a web server
+import http from "http"; // HTTP module for creating a server
+import cors from "cors"; // Middleware to enable Cross-Origin Resource Sharing (CORS)
+import rateLimit from "express-rate-limit"; // Middleware to limit the number of requests from a single IP
+import dotenv from "dotenv"; // Module to manage environment variables
+import passport from "passport"; // Library for authentication
+import session from "express-session"; // Middleware to manage sessions
+import connectMongo from "connect-mongodb-session"; // Library to store sessions in MongoDB
 
-import { ApolloServer } from "@apollo/server";
-import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
-import { expressMiddleware } from "@apollo/server/express4";
+// Import Apollo Server modules for GraphQL
+import { ApolloServer } from "@apollo/server"; // Library to create a GraphQL server
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer"; // Plugin to stop the HTTP server when Apollo Server is shut down
+import { expressMiddleware } from "@apollo/server/express4"; // Middleware to integrate Apollo Server with Express.js
 
-import mergedTypeDefs from "./typeDefs/index.js";
-import mergedResolvers from "./resolvers/index.js";
-import connectToMongoDB from "./db/connectDB.js";
-import { buildContext } from "graphql-passport";
+// Import GraphQL type definitions and resolvers
+import mergedTypeDefs from "./typeDefs/index.js"; // Combined GraphQL type definitions
+import mergedResolvers from "./resolvers/index.js"; // Combined GraphQL resolvers
 
+// Import function to connect to MongoDB
+import connectToMongoDB from "./db/connectDB.js"; // Function to connect the application to MongoDB
+
+// Import function to build GraphQL context with Passport.js
+import { buildContext } from "graphql-passport"; // Function to create a GraphQL context containing request and response
+
+// Import function to configure Passport.js
+import { configurePassport } from "./passport/passport.config.js"; // Function to set up Passport.js authentication strategies
+
+// Load environment variables from the .env file
 dotenv.config();
+
+// Configure Passport.js for authentication
+configurePassport();
+
+// Create an instance of Express.js
 const app = express();
 
+// Create an HTTP server using Express.js
 const httpServer = http.createServer(app);
 
+// Create a store to save sessions in MongoDB
 const MongoDBStore = connectMongo(session);
 
+// Configure the session store
 const store = new MongoDBStore({
-  uri: process.env.MONGODB_URI,
-  collection: "sessions",
+  uri: process.env.MONGODB_URI, // MongoDB URI from environment variables
+  collection: "sessions", // Collection name for storing sessions
 });
 
-store.on("erro", (err) => console.log(err));
+// Handle errors when saving sessions
+store.on("error", (err) => console.log(err));
 
+// Use middleware for session management
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
-    resave: false, // this option specifies whether to save the session to the store on every request
-    saveUninitialized: false, // this option specifies whether to create a session for the user if one doesn't exist
+    secret: process.env.SESSION_SECRET, // Secret key to encrypt sessions
+    resave: false, // Do not save the session to the store if there are no changes
+    saveUninitialized: false, // Do not create a session for users who are not logged in
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-      httpOnly: true, // this option prevents the Cross-Site Scripting (XSS) attacks.
-      //   secure: true, // this option specifies whether the cookie should only be sent over HTTPS, which is necessary for production environments
+      maxAge: 1000 * 60 * 60 * 24 * 7, // Session duration: 1 week
+      httpOnly: true, // Prevent cookie access via JavaScript (prevents XSS attacks)
+      // secure: true, // Only send cookies over HTTPS (enabled in production)
     },
-    store: store,
+    store: store, // Store sessions in MongoDB
   })
 );
 
+// Initialize Passport.js
 app.use(passport.initialize());
+
+// Enable session-based authentication with Passport.js
 app.use(passport.session());
 
+// Set up rate limiting to restrict the number of requests from a single IP
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000, // Time window: 15 minutes
+  max: 100, // Maximum of 100 requests per IP within the time window
 });
 app.use(limiter);
 
+// Create an instance of Apollo Server
 const server = new ApolloServer({
-  typeDefs: mergedTypeDefs,
-  resolvers: mergedResolvers,
-  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  typeDefs: mergedTypeDefs, // GraphQL type definitions
+  resolvers: mergedResolvers, // GraphQL resolvers
+  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })], // Plugin to stop the HTTP server when Apollo Server is shut down
 });
 
-await server.start(); // Ensure we wait for our server to start
+// Wait for Apollo Server to start
+await server.start();
 
-// Set up our Express middleware to handle CORS, body parsing and our expressMiddleware function.
+// Set up middleware for the GraphQL endpoint
 app.use(
-  "/graphql",
+  "/graphql", // Path for the GraphQL endpoint
   cors({
-    origin: "*",
-    credentials: true,
+    origin: "*", // Allow requests from all origins
+    credentials: true, // Allow sending credentials (cookies, session)
   }),
-  express.json(),
-  // expressMiddleware accepts the same arguments:
-  // an Apollo Server instance and optional configuration options
+  express.json(), // Middleware to parse JSON request bodies
+  // Middleware to integrate Apollo Server with Express.js
   expressMiddleware(server, {
+    // Build the GraphQL context containing request and response
     context: async ({ req, res }) => buildContext({ req, res }),
   })
 );
 
-// Modified server startup
+// Wait for the HTTP server to listen on port 5000
 await new Promise((resolve) => httpServer.listen({ port: 5000 }, resolve));
+
+// Connect the application to MongoDB
 await connectToMongoDB();
 
+// Display a message indicating that the server is ready
 console.log(`🚀 Server ready at http://localhost:5000/graphql`);
 
-// setup without express.js
+// Example setup for Apollo Server without Express.js (optional)
 // const server = new ApolloServer({
 //     typeDefs: mergedTypeDefs,
 //     resolvers: mergedResolvers,
