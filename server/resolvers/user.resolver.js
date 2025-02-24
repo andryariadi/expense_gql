@@ -40,6 +40,8 @@ const userResolver = {
 
   Mutation: {
     signUp: async (_, { input }, context) => {
+      console.log({ context }, "<---signupMutation");
+
       try {
         const { username, name, password, gender } = input;
 
