@@ -19,7 +19,7 @@ const userTypeDef = `#graphql
  } #This is a Operation type Query
 
  type Mutation {
-    signup(input: SignUpInput!): User
+    signUp(input: SignUpInput!): User
     login(input: LoginInput!): User
     logout: LogoutResponse
  } #This is a Operation type Mutation

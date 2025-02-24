@@ -1,4 +1,3 @@
-// Import necessary libraries and modules
 import express from "express"; // Framework for creating a web server
 import http from "http"; // HTTP module for creating a server
 import cors from "cors"; // Middleware to enable Cross-Origin Resource Sharing (CORS)
