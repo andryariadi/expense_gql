@@ -34,7 +34,7 @@ const transactionResolver = {
   Mutation: {
     createTransaction: async (_, { input }, context) => {
       try {
-        const newTransaction = await new Transaction({
+        const newTransaction = new Transaction({
           ...input,
           userId: context.getUser()._id,
         });
