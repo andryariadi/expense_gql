@@ -1,10 +1,3 @@
-import { GridBackgroundDemo } from "@/components/GridBackground";
-
 export default function Home() {
-  return (
-    <div className="bg-pink-600">
-      Hello bree
-      <GridBackgroundDemo />
-    </div>
-  );
+  return <main className="b-rose-500 min-h-screen">Hello bree</main>;
 }
