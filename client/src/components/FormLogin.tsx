@@ -9,14 +9,28 @@ import { TbLoader } from "react-icons/tb";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { z } from "zod";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { LoginFormValidation } from "@/libs/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const FormLogin = () => {
   const [openPass, setOpenPass] = useState(false);
 
-  const loading = false;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<z.infer<typeof LoginFormValidation>>({
+    resolver: zodResolver(LoginFormValidation),
+  });
+
+  const handleSubmitLogin: SubmitHandler<z.infer<typeof LoginFormValidation>> = async (data) => {
+    console.log({ data }, "<---registerForm");
+  };
 
   return (
-    <form className="b-sky-500 w-full min-h-[35rem] flex items-center justify-center">
+    <form onSubmit={handleSubmit(handleSubmitLogin)} className="b-sky-500 w-full min-h-[35rem] flex items-center justify-center">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="h-full w-full max-w-md bg-gray-700 p-5 rounded-md border border-dark-500 space-y-7">
         {/* Title */}
         <div className="text-center space-y-1">
@@ -27,17 +41,25 @@ const FormLogin = () => {
         </div>
 
         {/* Form Input */}
-        <div className="b-emerald-500 grid grid-cols-1 gap-5">
+        <div className="b-emerald-500 grid grid-cols-1 gap-8">
           <div className="relative">
-            <InputField icon={<CiUser size={19} />} type="text" placeholder="Username" name="username" />
+            <InputField icon={<CiUser size={19} />} type="text" placeholder="Username" name="username" propData={{ ...register("username") }} />
 
-            {/* {errors.insuranceProvider && <p className="absolute -bottom-5 text-red-500 text-sm">{errors.insuranceProvider.message as string}</p>} */}
+            {errors.username && <p className="absolute -bottom-5 text-red-500 text-sm">{errors.username.message as string}</p>}
           </div>
 
           <div className="relative">
-            <InputField icon={<VscLockSmall size={22} />} passIcon={openPass ? <PiEye size={22} /> : <RiEyeCloseFill size={20} />} openPass={openPass} setOpenPass={setOpenPass} type={openPass ? "text" : "password"} placeholder="Password" />
+            <InputField
+              icon={<VscLockSmall size={22} />}
+              passIcon={openPass ? <PiEye size={22} /> : <RiEyeCloseFill size={20} />}
+              openPass={openPass}
+              setOpenPass={setOpenPass}
+              type={openPass ? "text" : "password"}
+              placeholder="Password"
+              propData={{ ...register("password") }}
+            />
 
-            {/* {errors.insuranceProvider && <p className="absolute -bottom-5 text-red-500 text-sm">{errors.insuranceProvider.message as string}</p>} */}
+            {errors.password && <p className="absolute -bottom-5 text-red-500 text-sm">{errors.password.message as string}</p>}
           </div>
 
           <motion.button
@@ -45,9 +67,9 @@ const FormLogin = () => {
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.95 }}
             type="submit"
-            disabled={loading}
+            disabled={isSubmitting}
           >
-            {loading ? <TbLoader scale={22} className="animate-spin mx-auto" /> : "Login"}
+            {isSubmitting ? <TbLoader scale={22} className="animate-spin mx-auto" /> : "Login"}
           </motion.button>
         </div>
 

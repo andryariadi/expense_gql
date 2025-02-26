@@ -10,20 +10,40 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import GenderRadio from "./GenderRadio";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import { SingupFormValidation } from "@/libs/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const FormSignup = () => {
   const [openPass, setOpenPass] = useState(false);
   const [selectedGender, setSelectedGender] = useState<"male" | "female">("male");
 
   const handleCheckboxChange = (gender?: "male" | "female") => {
-    // setValue("gender", gender ?? "male");
+    setValue("gender", gender ?? "male");
     setSelectedGender(gender ?? "male");
   };
 
-  const loading = false;
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<z.infer<typeof SingupFormValidation>>({
+    resolver: zodResolver(SingupFormValidation),
+    defaultValues: {
+      gender: "male",
+    },
+  });
+
+  const handleSubmitRegister: SubmitHandler<z.infer<typeof SingupFormValidation>> = async (data) => {
+    console.log({ data }, "<---registerForm");
+  };
+
+  console.log({ errors }, "<---signupForm");
 
   return (
-    <form className="b-sky-500 w-full min-h-[35rem] flex items-center justify-center">
+    <form onSubmit={handleSubmit(handleSubmitRegister)} className="b-sky-500 w-full min-h-[35rem] flex items-center justify-center">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="h-full w-full max-w-md bg-gray-700 p-5 rounded-md border border-dark-500 space-y-7">
         {/* Title */}
         <div className="text-center space-y-1">
@@ -34,27 +54,35 @@ const FormSignup = () => {
         </div>
 
         {/* Form Input */}
-        <div className="b-emerald-500 grid grid-cols-1 gap-5">
+        <div className="b-emerald-500 grid grid-cols-1 gap-8">
           <div className="relative">
-            <InputField icon={<CiUser size={19} />} type="text" placeholder="Full Name" name="fullName" />
+            <InputField icon={<CiUser size={19} />} type="text" placeholder="Full Name" name="name" propData={{ ...register("name") }} />
 
-            {/* {errors.insuranceProvider && <p className="absolute -bottom-5 text-red-500 text-sm">{errors.insuranceProvider.message as string}</p>} */}
+            {errors.name && <p className="absolute -bottom-5 text-red-500 text-sm">{errors.name.message as string}</p>}
           </div>
 
           <div className="relative">
-            <InputField icon={<CiCreditCard2 size={19} />} type="text" placeholder="Username" name="username" />
+            <InputField icon={<CiCreditCard2 size={19} />} type="text" placeholder="Username" name="username" propData={{ ...register("username") }} />
 
-            {/* {errors.insuranceProvider && <p className="absolute -bottom-5 text-red-500 text-sm">{errors.insuranceProvider.message as string}</p>} */}
+            {errors.username && <p className="absolute -bottom-5 text-red-500 text-sm">{errors.username.message as string}</p>}
           </div>
 
           <div className="relative">
-            <InputField icon={<VscLockSmall size={22} />} passIcon={openPass ? <PiEye size={22} /> : <RiEyeCloseFill size={20} />} openPass={openPass} setOpenPass={setOpenPass} type={openPass ? "text" : "password"} placeholder="Password" />
+            <InputField
+              icon={<VscLockSmall size={22} />}
+              passIcon={openPass ? <PiEye size={22} /> : <RiEyeCloseFill size={20} />}
+              openPass={openPass}
+              setOpenPass={setOpenPass}
+              type={openPass ? "text" : "password"}
+              placeholder="Password"
+              propData={{ ...register("password") }}
+            />
 
-            {/* {errors.insuranceProvider && <p className="absolute -bottom-5 text-red-500 text-sm">{errors.insuranceProvider.message as string}</p>} */}
+            {errors.password && <p className="absolute -bottom-5 text-red-500 text-sm">{errors.password.message as string}</p>}
           </div>
 
           <div className="relative g:col-span-2">
-            <GenderRadio onRadioChange={handleCheckboxChange} selectedGender={selectedGender} />
+            <GenderRadio onRadioChange={handleCheckboxChange} selectedGender={selectedGender} errors={{ gender: errors?.gender as { message: string } }} />
           </div>
 
           <motion.button
@@ -62,9 +90,9 @@ const FormSignup = () => {
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.95 }}
             type="submit"
-            disabled={loading}
+            disabled={isSubmitting}
           >
-            {loading ? <TbLoader scale={22} className="animate-spin mx-auto" /> : "Sign Up"}
+            {isSubmitting ? <TbLoader scale={22} className="animate-spin mx-auto" /> : "Sign Up"}
           </motion.button>
         </div>
 
