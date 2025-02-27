@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Header = () => {
   return (
-    <header className="b-amber-500 mb-10">
+    <header className="b-amber-500 mb-10 h-[10rem] flex flex-col items-center justify-center">
       <h1 className="relative z-50 text-4xl md:text-6xl lg:text-8xl font-bold text-center text-white pt-10">
         Expense{" "}
         <Link href="/" className="text-logo">

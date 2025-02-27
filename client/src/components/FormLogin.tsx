@@ -26,8 +26,10 @@ const FormLogin = () => {
   });
 
   const handleSubmitLogin: SubmitHandler<z.infer<typeof LoginFormValidation>> = async (data) => {
-    console.log({ data }, "<---registerForm");
+    console.log({ data }, "<---loginForm");
   };
+
+  console.log({ errors }, "<---loginForm");
 
   return (
     <form onSubmit={handleSubmit(handleSubmitLogin)} className="b-sky-500 w-full min-h-[35rem] flex items-center justify-center">
