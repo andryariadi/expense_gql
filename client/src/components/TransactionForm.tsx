@@ -17,7 +17,7 @@ import { LiaSortAmountUpSolid } from "react-icons/lia";
 import { CiLocationOn } from "react-icons/ci";
 import { useState } from "react";
 
-const UpdateTransactionForm = () => {
+const TransactionForm = () => {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
 
   const handleDateChange = (date: Date | null) => {
@@ -40,7 +40,7 @@ const UpdateTransactionForm = () => {
   });
 
   const handleSubmitUpdateTransaction: SubmitHandler<z.infer<typeof TransactionFormValidation>> = async (data) => {
-    console.log({ data }, "<---updateTransactionForm");
+    console.log({ data }, "<---transactionForm");
   };
   return (
     <form onSubmit={handleSubmit(handleSubmitUpdateTransaction)} className="b-sky-700 w-full max-w-xl">
@@ -119,8 +119,9 @@ const UpdateTransactionForm = () => {
               name="amount"
               propData={{
                 ...register("amount", {
-                  //   setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                  // Choose one of the following methods to handle number input
                   valueAsNumber: true,
+                  //   setValueAs: (v) => (v === "" ? undefined : Number(v)),
                 }),
               }}
             />
@@ -155,4 +156,4 @@ const UpdateTransactionForm = () => {
   );
 };
 
-export default UpdateTransactionForm;
+export default TransactionForm;

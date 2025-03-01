@@ -1,4 +1,4 @@
-import UpdateTransactionForm from "@/components/UpdateTransactionForm";
+import TransactionForm from "@/components/TransactionForm";
 
 const UpdateTransactionPage = () => {
   return (
@@ -8,7 +8,7 @@ const UpdateTransactionPage = () => {
         <h2 className="md:text-4xl text-2xl lg:text-4xl font-bold text-center relative z-50 mb-4 mr-4 bg-gradient-to-r from-pink-600 via-indigo-500 to-pink-400 inline-block text-transparent bg-clip-text">Update this transaction</h2>
 
         {/* Form */}
-        <UpdateTransactionForm />
+        <TransactionForm />
       </div>
     </main>
   );
