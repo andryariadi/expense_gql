@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import GridBackground from "@/components/GridBackground";
+import ApolloWrapper from "@/components/ApolloWrapper";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -21,7 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${outfit.className} antialiased`}>
-        <GridBackground>{children}</GridBackground>
+        <ApolloWrapper>
+          <GridBackground>{children}</GridBackground>
+        </ApolloWrapper>
       </body>
     </html>
   );

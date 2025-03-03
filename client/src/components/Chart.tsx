@@ -21,7 +21,7 @@ const Chart = () => {
     ],
   };
   return (
-    <div className="h-[330px] w-[330px] md:h-[360px] md:w-[360px]  ">
+    <div className="h-[330px] w-[330px] md:h-[360px] md:w-[360px]">
       <Doughnut data={chartData} />
     </div>
   );
