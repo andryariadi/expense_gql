@@ -70,6 +70,11 @@ app.use(passport.initialize());
 // Enable session-based authentication with Passport.js
 app.use(passport.session());
 
+app.use((req, res, next) => {
+  console.log(`Request from: ${req.ip} - ${req.method} ${req.url}`);
+  next();
+});
+
 // Set up rate limiting to restrict the number of requests from a single IP
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // Time window: 15 minutes
@@ -91,7 +96,7 @@ await server.start();
 app.use(
   "/graphql", // Path for the GraphQL endpoint
   cors({
-    origin: "*", // Allow requests from all origins
+    origin: "http://localhost:3000", // Allow requests from all origins
     credentials: true, // Allow sending credentials (cookies, session)
   }),
   express.json(), // Middleware to parse JSON request bodies
