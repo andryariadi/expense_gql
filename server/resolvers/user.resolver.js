@@ -13,7 +13,7 @@ const userResolver = {
         console.log(error, "<----usersError");
         throw new Error(error.message || "Internal server error!");
       }
-    }, // name of the query users must match the name of the query in the user.typeDef.js and Appolo server
+    }, // name of the query users must match the name of the query in the user.typeDef.js and Appolo client
 
     user: async (_, { userId }) => {
       try {
@@ -67,7 +67,7 @@ const userResolver = {
 
         await newUser.save();
 
-        context.login(newUser);
+        await context.login(newUser);
 
         return newUser;
       } catch (error) {

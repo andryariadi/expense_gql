@@ -1,7 +1,7 @@
 import CardLists from "@/components/CardLists";
 import Chart from "@/components/Chart";
 import TransactionForm from "@/components/TransactionForm";
-import { GET_AUTHENTICATED_USER } from "@/graphql/queries/user.query";
+import { GET_AUTHENTICATED_USER, GET_USERS } from "@/graphql/queries/user.query";
 import { getClient } from "@/libs/ApolloConfig";
 // import { useQuery } from "@apollo/client";
 // import { graphqlAxios } from "@/libs/graphqlAxios";
@@ -9,7 +9,7 @@ import { getClient } from "@/libs/ApolloConfig";
 export default async function Home() {
   // fetch data in Server Component use Apollo Client
   const { data } = await getClient().query({
-    query: GET_AUTHENTICATED_USER,
+    query: GET_USERS,
   });
 
   // fetch data in Server Component use Axios

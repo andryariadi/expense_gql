@@ -6,9 +6,9 @@ import bcrypt from "bcryptjs";
 export const configurePassport = async () => {
   // Serialize user: save user ID to session
   passport.serializeUser((user, done) => {
-    console.log({ user, done }, "<----passportSerializeUser");
+    console.log({ user, userId: user._id, done }, "<----passportSerializeUser");
 
-    done(null, user.id);
+    done(null, user._id); // property id name must be the same as in database
   });
 
   // Deserialize user: Retrieve the user from the session based on ID

@@ -14,6 +14,10 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { SingupFormValidation } from "@/libs/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@apollo/client";
+import { SIGN_UP } from "@/graphql/mutations/user,mutation";
+import toast from "react-hot-toast";
+import { toastStyle } from "@/lib/utils";
 
 const FormSignup = () => {
   const [openPass, setOpenPass] = useState(false);
@@ -29,6 +33,7 @@ const FormSignup = () => {
     handleSubmit,
     setValue,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm<z.infer<typeof SingupFormValidation>>({
     resolver: zodResolver(SingupFormValidation),
     defaultValues: {
@@ -36,8 +41,35 @@ const FormSignup = () => {
     },
   });
 
+  const [signup] = useMutation(SIGN_UP);
+
   const handleSubmitRegister: SubmitHandler<z.infer<typeof SingupFormValidation>> = async (data) => {
     console.log({ data }, "<---registerForm");
+
+    try {
+      const res = await signup({
+        variables: {
+          input: data,
+        },
+      });
+
+      console.log({ res }, "<---resRegisterForm");
+
+      if (res.data.signUp) {
+        toast.success("Account created successfully", {
+          style: toastStyle,
+        });
+
+        reset();
+      }
+    } catch (error) {
+      console.log(error, "<---errorRegisterForm");
+      const errorMessage = error instanceof Error ? error.message : "Something went wrong";
+
+      toast.error(errorMessage, {
+        style: toastStyle,
+      });
+    }
   };
 
   console.log({ errors }, "<---signupForm");

@@ -15,10 +15,12 @@ export const apolloClient = () => {
   const httpLink = new HttpLink({
     uri: "http://localhost:5000/graphql",
     fetchOptions: { cache: "no-store" },
+    credentials: "include", // Include credentials in the request headers
   });
 
   return new ApolloClient({
     cache: new InMemoryCache(),
     link: httpLink,
+    credentials: "include", // Include credentials in the request headers
   });
 };

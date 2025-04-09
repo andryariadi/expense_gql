@@ -58,7 +58,8 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7, // Session duration: 1 week
       httpOnly: true, // Prevent cookie access via JavaScript (prevents XSS attacks)
-      // secure: true, // Only send cookies over HTTPS (enabled in production)
+      secure: process.env.NODE_ENV === "production", // Set to true to only send cookies over HTTPS (enabled in production)
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // SameSite attribute for cookies (set to "none" in production for cross-origin requests)
     },
     store: store, // Store sessions in MongoDB
   })
@@ -70,17 +71,17 @@ app.use(passport.initialize());
 // Enable session-based authentication with Passport.js
 app.use(passport.session());
 
-app.use((req, res, next) => {
-  console.log(`Request from: ${req.ip} - ${req.method} ${req.url}`);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(`Request from: ${req.ip} - ${req.method} ${req.url}`);
+//   next();
+// });
 
 // Set up rate limiting to restrict the number of requests from a single IP
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // Time window: 15 minutes
-  max: 100, // Maximum of 100 requests per IP within the time window
-});
-app.use(limiter);
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // Time window: 15 minutes
+//   max: 100, // Maximum of 100 requests per IP within the time window
+// });
+// app.use(limiter);
 
 // Create an instance of Apollo Server
 const server = new ApolloServer({
@@ -96,7 +97,7 @@ await server.start();
 app.use(
   "/graphql", // Path for the GraphQL endpoint
   cors({
-    origin: "http://localhost:3000", // Allow requests from all origins
+    origin: "http://localhost:3000", // Allow requests from this origin (frontend application)
     credentials: true, // Allow sending credentials (cookies, session)
   }),
   express.json(), // Middleware to parse JSON request bodies
