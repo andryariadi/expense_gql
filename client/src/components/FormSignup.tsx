@@ -15,13 +15,16 @@ import { z } from "zod";
 import { SingupFormValidation } from "@/libs/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@apollo/client";
-import { SIGN_UP } from "@/graphql/mutations/user,mutation";
+import { SIGN_UP } from "@/graphql/mutations/user.mutation";
 import toast from "react-hot-toast";
 import { toastStyle } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const FormSignup = () => {
   const [openPass, setOpenPass] = useState(false);
   const [selectedGender, setSelectedGender] = useState<"male" | "female">("male");
+
+  const router = useRouter();
 
   const handleCheckboxChange = (gender?: "male" | "female") => {
     setValue("gender", gender ?? "male");
@@ -41,7 +44,9 @@ const FormSignup = () => {
     },
   });
 
-  const [signup] = useMutation(SIGN_UP);
+  const [signup] = useMutation(SIGN_UP, {
+    refetchQueries: ["GetAuthenticatedUser"],
+  });
 
   const handleSubmitRegister: SubmitHandler<z.infer<typeof SingupFormValidation>> = async (data) => {
     console.log({ data }, "<---registerForm");
@@ -61,6 +66,8 @@ const FormSignup = () => {
         });
 
         reset();
+
+        router.refresh();
       }
     } catch (error) {
       console.log(error, "<---errorRegisterForm");

@@ -2,10 +2,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Daftar route yang hanya bisa diakses tanpa auth (public routes)
 const publicRoutes = ["/login", "/signup"];
 
-// Daftar route yang membutuhkan auth (protected routes)
 const protectedRoutes = ["/", "/transaction", "/profile"];
 
 export function middleware(request: NextRequest) {

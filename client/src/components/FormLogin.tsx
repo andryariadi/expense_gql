@@ -13,20 +13,59 @@ import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { LoginFormValidation } from "@/libs/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@apollo/client";
+import { LOGIN } from "@/graphql/mutations/user.mutation";
+import toast from "react-hot-toast";
+import { toastStyle } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const FormLogin = () => {
   const [openPass, setOpenPass] = useState(false);
+
+  const router = useRouter();
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm<z.infer<typeof LoginFormValidation>>({
     resolver: zodResolver(LoginFormValidation),
   });
 
+  const [login] = useMutation(LOGIN, {
+    refetchQueries: ["GetAuthenticatedUser"],
+  });
+
   const handleSubmitLogin: SubmitHandler<z.infer<typeof LoginFormValidation>> = async (data) => {
     console.log({ data }, "<---loginForm");
+
+    try {
+      const res = await login({
+        variables: {
+          input: data,
+        },
+      });
+
+      console.log({ res }, "<---resLoginForm");
+
+      if (res.data.login) {
+        router.refresh();
+
+        toast.success("Logged in successfully", {
+          style: toastStyle,
+        });
+
+        reset();
+      }
+    } catch (error) {
+      console.log(error, "<---errorLoginForm");
+      const errorMessage = error instanceof Error ? error.message : "Something went wrong";
+
+      toast.error(errorMessage, {
+        style: toastStyle,
+      });
+    }
   };
 
   console.log({ errors }, "<---loginForm");

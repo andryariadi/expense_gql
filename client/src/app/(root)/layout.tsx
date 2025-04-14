@@ -1,4 +1,4 @@
-import { AuthHandler } from "@/components/AuthHandler";
+// import { AuthHandler } from "@/components/AuthHandler";
 import Header from "@/components/Header";
 
 export default function AppLayout({
@@ -8,7 +8,7 @@ export default function AppLayout({
 }>) {
   return (
     <>
-      <AuthHandler />
+      {/* <AuthHandler /> */}
       <Header />
       {children}
     </>

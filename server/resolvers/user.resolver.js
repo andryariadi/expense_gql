@@ -26,14 +26,14 @@ const userResolver = {
       }
     }, // args userId must match the name of the query in the user.typeDef.js and Appolo server
 
-    authUser: async (_, __, context) => {
+    authUser: async (_, ___, context) => {
       try {
         const user = await context.getUser();
 
         return user;
       } catch (error) {
-        console.log(error, "<----authUserError");
-        throw new Error(error.message || "Internal server error!");
+        console.error(error, "<----authUserError");
+        throw new Error("Internal server error");
       }
     },
   },
