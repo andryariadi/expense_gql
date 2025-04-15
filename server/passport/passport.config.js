@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 export const configurePassport = async () => {
   // Serialize user: save user ID to session and this function running when user signup
   passport.serializeUser((user, done) => {
-    console.log({ user, userId: user._id, done }, "<----passportSerializeUser");
+    // console.log({ user, userId: user._id, done }, "<----passportSerializeUser");
 
     done(null, user._id); // property id name must be the same as in database
   });
@@ -16,7 +16,7 @@ export const configurePassport = async () => {
     try {
       const user = await User.findById({ _id: id });
 
-      console.log({ user }, "<----passportDeserializeUser");
+      // console.log({ user }, "<----passportDeserializeUser");
 
       done(null, user);
     } catch (error) {
@@ -37,7 +37,7 @@ export const configurePassport = async () => {
 
         if (!validPassword) throw new Error("Invalid username or password!");
 
-        console.log({ user }, "<----passportGraphQLLocalStrategy");
+        // console.log({ user }, "<----passportGraphQLLocalStrategy");
 
         return done(null, user);
       } catch (error) {

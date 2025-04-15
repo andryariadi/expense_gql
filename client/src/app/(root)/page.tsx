@@ -11,7 +11,12 @@ export default async function Home() {
   // fetch data in Server Component use Apollo Client
   const { data } = await query({
     query: GET_AUTHENTICATED_USER,
-  }); // better to use query than getClient().query because of automatic cookie handling
+  }); // better to use query() instead of getClient() in Server Component
+
+  // const client = await getClient();
+  // const { data: user } = await client.query({
+  //   query: GET_AUTHENTICATED_USER,
+  // }); // if you use getClient()
 
   const { data: users } = await query({
     query: GET_USERS,

@@ -16,6 +16,10 @@ import { Category, PaymentType } from "@/constant";
 import { LiaSortAmountUpSolid } from "react-icons/lia";
 import { CiLocationOn } from "react-icons/ci";
 import { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { CREATE_TRANSACTION } from "@/graphql/mutations/transaction.mutation";
+import toast from "react-hot-toast";
+import { toastStyle } from "@/lib/utils";
 
 const TransactionForm = () => {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
@@ -32,6 +36,7 @@ const TransactionForm = () => {
     formState: { errors, isSubmitting },
     control,
     watch,
+    reset,
   } = useForm({
     resolver: zodResolver(TransactionFormValidation),
     defaultValues: {
@@ -39,8 +44,35 @@ const TransactionForm = () => {
     },
   });
 
+  const [createTransaction] = useMutation(CREATE_TRANSACTION);
+
   const handleSubmitUpdateTransaction: SubmitHandler<z.infer<typeof TransactionFormValidation>> = async (data) => {
     console.log({ data }, "<---transactionForm");
+
+    try {
+      const res = await createTransaction({
+        variables: {
+          input: data,
+        },
+      });
+
+      console.log({ res }, "<---resTransactionForm");
+
+      if (res.data.createTransaction) {
+        toast.success("Transaction created successfully", {
+          style: toastStyle,
+        });
+
+        reset();
+      }
+    } catch (error) {
+      console.log(error, "<----errorTransactionForm");
+      const errorMessage = error instanceof Error ? error.message : "Something went wrong";
+
+      toast.error(errorMessage, {
+        style: toastStyle,
+      });
+    }
   };
   return (
     <form onSubmit={handleSubmit(handleSubmitUpdateTransaction)} className="b-sky-700 w-full max-w-xl">
@@ -148,7 +180,7 @@ const TransactionForm = () => {
             type="submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? <TbLoader scale={22} className="animate-spin mx-auto" /> : "Update Transaction"}
+            {isSubmitting ? <TbLoader scale={22} className="animate-spin mx-auto" /> : "Create Transaction"}
           </motion.button>
         </div>
       </motion.div>
