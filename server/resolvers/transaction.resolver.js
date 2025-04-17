@@ -10,7 +10,7 @@ const transactionResolver = {
 
         const userId = await context.getUser()._id;
 
-        const transactions = await Transaction.find({ userId });
+        const transactions = await Transaction.find({ userId }).sort({ createdAt: -1 });
 
         return transactions;
       } catch (error) {

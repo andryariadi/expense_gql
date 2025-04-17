@@ -1,27 +1,51 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { CREATE_TRANSACTION } from "@/graphql/mutations/transaction.mutation";
+import { CREATE_TRANSACTION, DELETE_TRANSACTION } from "@/graphql/mutations/transaction.mutation";
 import { getClient } from "@/libs/ApolloConfig";
 
-export async function createTransactionAction(inputData: Record<string, string | number | boolean | Date>) {
-  const client = getClient();
-
+export async function createTransactionAction(inputData: Record<string, unknown>) {
   try {
-    const res = (await client).mutate({
+    // Wait for the client to resolve first
+    const client = await getClient();
+
+    const { data } = await client.mutate({
       mutation: CREATE_TRANSACTION,
-      variables: {
-        input: inputData,
-      },
+      variables: { input: inputData },
     });
 
-    const data = await res;
+    revalidatePath("/");
 
-    console.log({ data }, "<---resTransactionAction");
+    return { success: true, data: data.createTransaction };
+  } catch (error) {
+    console.error("Transaction action error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+export async function deleteTransactionAction(transactionId: string) {
+  try {
+    // Wait for the client to resolve first
+    const client = await getClient();
+
+    const { data } = await client.mutate({
+      mutation: DELETE_TRANSACTION,
+      variables: { transactionId: transactionId },
+    });
+
+    console.log({ data }, "<---deleteTransactionAction");
 
     revalidatePath("/");
-    return { success: true, data: data.data.createTransaction };
+
+    return { success: true, data: data.deleteTransaction };
   } catch (error) {
-    return { success: false, error };
+    console.error("Transaction action error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }
