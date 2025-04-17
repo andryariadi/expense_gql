@@ -20,9 +20,13 @@ import { useMutation } from "@apollo/client";
 import { CREATE_TRANSACTION } from "@/graphql/mutations/transaction.mutation";
 import toast from "react-hot-toast";
 import { toastStyle } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+// import { createTransactionAction } from "@/actions/transaction.action";
 
 const TransactionForm = () => {
   const [startDate, setStartDate] = useState<Date | null>(new Date());
+
+  const router = useRouter();
 
   const handleDateChange = (date: Date | null) => {
     setStartDate(date);
@@ -44,7 +48,15 @@ const TransactionForm = () => {
     },
   });
 
-  const [createTransaction] = useMutation(CREATE_TRANSACTION);
+  const [createTransaction] = useMutation(CREATE_TRANSACTION, {
+    // refetchQueries: ["GetTransactions"], // how to update client-side rendered data in real time
+
+    // how to update server-side rendered data in real time
+    onCompleted: () => {
+      // window.location.reload(); // it works but we see the page refreshed
+      router.refresh(); // this is the best way to refresh the page without reloading
+    },
+  });
 
   const handleSubmitUpdateTransaction: SubmitHandler<z.infer<typeof TransactionFormValidation>> = async (data) => {
     console.log({ data }, "<---transactionForm");
@@ -56,8 +68,6 @@ const TransactionForm = () => {
         },
       });
 
-      console.log({ res }, "<---resTransactionForm");
-
       if (res.data.createTransaction) {
         toast.success("Transaction created successfully", {
           style: toastStyle,
@@ -65,6 +75,18 @@ const TransactionForm = () => {
 
         reset();
       }
+
+      // if using revalidatePath to update the data rendered on the server
+      // const res = await createTransactionAction(data);
+      // if (res.data) {
+      //   toast.success("Transaction created successfully", {
+      //     style: toastStyle,
+      //   });
+
+      //   reset();
+      // }
+
+      console.log({ res }, "<---resTransactionForm");
     } catch (error) {
       console.log(error, "<----errorTransactionForm");
       const errorMessage = error instanceof Error ? error.message : "Something went wrong";

@@ -1,6 +1,9 @@
+// "use client";
+
 import { query } from "@/libs/ApolloConfig";
 import Card from "./Card";
 import { GET_TRANSACTIONS } from "@/graphql/queries/transaction.query";
+// import { useQuery } from "@apollo/client";
 
 type Transaction = {
   _id: string;
@@ -21,6 +24,11 @@ const CardLists = async () => {
   if (error) return <p>Error: {error.message}</p>;
 
   console.log({ loading, error, data }, "<---CardListsData");
+
+  // fetch data in Client Component use Apollo Client
+  // const { loading, data, error } = useQuery(GET_TRANSACTIONS);
+  // if (loading) return <p>Loading...</p>;
+  // if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div className="w-full px-10 min-h-[40vh]">

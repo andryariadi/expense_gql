@@ -30,7 +30,7 @@ const Card = ({ cardType, transaction }: { cardType: string; transaction: Transa
 
   const formatedDate = formatDate(transaction.date);
 
-  console.log({ cardType, transaction, formatedDate }, "<---cardTypeTransaction");
+  // console.log({ cardType, transaction, formatedDate }, "<---cardTypeTransaction");
 
   return (
     <div className={`rounded-md p-4 bg-gradient-to-br ${cardClass}`}>

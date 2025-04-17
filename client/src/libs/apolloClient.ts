@@ -14,7 +14,7 @@ import { ApolloClient, InMemoryCache } from "@apollo/experimental-nextjs-app-sup
 export const apolloClient = () => {
   const httpLink = new HttpLink({
     uri: "http://localhost:5000/graphql",
-    fetchOptions: { cache: "no-store" },
+    // fetchOptions: { cache: "no-store" },
     credentials: "include", // Include credentials in the request headers
   });
 
