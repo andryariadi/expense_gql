@@ -3,17 +3,8 @@
 import { query } from "@/libs/ApolloConfig";
 import Card from "./Card";
 import { GET_TRANSACTIONS } from "@/graphql/queries/transaction.query";
+import { Transaction } from "@/types";
 // import { useQuery } from "@apollo/client";
-
-type Transaction = {
-  _id: string;
-  description: string;
-  category: "Cash" | "Card";
-  paymentType: "Saving" | "Expense" | "Investment";
-  amount: number;
-  location: string;
-  date: string;
-};
 
 const CardLists = async () => {
   const { data, loading, error } = await query({
@@ -23,7 +14,7 @@ const CardLists = async () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  console.log({ loading, error, data }, "<---CardListsData");
+  // console.log({ loading, error, data }, "<---CardListsData");
 
   // fetch data in Client Component use Apollo Client
   // const { loading, data, error } = useQuery(GET_TRANSACTIONS);

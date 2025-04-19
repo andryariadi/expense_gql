@@ -17,25 +17,29 @@ import { LiaSortAmountUpSolid } from "react-icons/lia";
 import { CiLocationOn } from "react-icons/ci";
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
-import { CREATE_TRANSACTION } from "@/graphql/mutations/transaction.mutation";
+import { CREATE_TRANSACTION, UPDATE_TRANSACTION } from "@/graphql/mutations/transaction.mutation";
 import toast from "react-hot-toast";
 import { toastStyle } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { Transaction } from "@/types";
+// import { updateTransactionAction } from "@/actions/transaction.action";
 // import { createTransactionAction } from "@/actions/transaction.action";
 
-const TransactionForm = () => {
+const TransactionForm = ({ transaction }: { transaction?: Transaction }) => {
+  console.log({ transaction }, "<---transactionForm");
+
   const [startDate, setStartDate] = useState<Date | null>(new Date());
 
   const router = useRouter();
 
-  const handleDateChange = (date: Date | null) => {
-    setStartDate(date);
-    setValue("date", date ?? new Date(), { shouldValidate: true });
-  };
+  // const handleDateChange = (date: Date | null) => {
+  //   setStartDate(date);
+  //   setValue("date", date ?? new Date(), { shouldValidate: true });
+  // };
 
   const {
     register,
-    setValue,
+    // setValue,
     handleSubmit,
     formState: { errors, isSubmitting },
     control,
@@ -44,7 +48,12 @@ const TransactionForm = () => {
   } = useForm({
     resolver: zodResolver(TransactionFormValidation),
     defaultValues: {
-      date: new Date(),
+      description: transaction?.description ? transaction.description : "",
+      paymentType: transaction?.paymentType ? transaction.paymentType : undefined,
+      category: transaction?.category ? transaction.category : undefined,
+      amount: transaction?.amount ? transaction.amount : undefined,
+      location: transaction?.location ? transaction.location : "",
+      date: transaction?.date ? new Date(Number(transaction.date)) : new Date(),
     },
   });
 
@@ -58,35 +67,74 @@ const TransactionForm = () => {
     },
   });
 
+  const [updateTransaction] = useMutation(UPDATE_TRANSACTION, {
+    // refetchQueries: ["GetTransactions"], // how to update client-side rendered data in real time
+
+    // how to update server-side rendered data in real time
+    onCompleted: () => {
+      // window.location.reload(); // it works but we see the page refreshed
+      router.push("/"); // this is the best way to refresh the page without reloading
+    },
+  });
+
   const handleSubmitUpdateTransaction: SubmitHandler<z.infer<typeof TransactionFormValidation>> = async (data) => {
     console.log({ data }, "<---transactionForm");
 
     try {
-      const res = await createTransaction({
-        variables: {
-          input: data,
-        },
-      });
-
-      if (res.data.createTransaction) {
-        toast.success("Transaction created successfully", {
-          style: toastStyle,
+      if (transaction) {
+        const res = await updateTransaction({
+          variables: {
+            input: {
+              ...data,
+              transactionId: transaction._id,
+            },
+          },
         });
 
-        reset();
+        if (res.data.updateTransaction) {
+          toast.success("Transaction updated successfully", {
+            style: toastStyle,
+          });
+        }
+
+        // if using revalidatePath and sever action to update the data rendered on the server
+        // const res = await updateTransactionAction(transaction._id, data);
+        // if (res.data) {
+        //   toast.success(res.message, {
+        //     style: toastStyle,
+        //   });
+
+        //   router.push("/");
+        // }
+
+        console.log({ res }, "<---resTransactionForm");
+      } else {
+        const res = await createTransaction({
+          variables: {
+            input: data,
+          },
+        });
+
+        if (res.data.createTransaction) {
+          toast.success("Transaction created successfully", {
+            style: toastStyle,
+          });
+
+          reset();
+        }
+
+        // if using revalidatePath to update the data rendered on the server
+        // const res = await createTransactionAction(data);
+        // if (res.data) {
+        //   toast.success("Transaction created successfully", {
+        //     style: toastStyle,
+        //   });
+
+        //   reset();
+        // }
+
+        console.log({ res }, "<---resTransactionForm");
       }
-
-      // if using revalidatePath to update the data rendered on the server
-      // const res = await createTransactionAction(data);
-      // if (res.data) {
-      //   toast.success("Transaction created successfully", {
-      //     style: toastStyle,
-      //   });
-
-      //   reset();
-      // }
-
-      console.log({ res }, "<---resTransactionForm");
     } catch (error) {
       console.log(error, "<----errorTransactionForm");
       const errorMessage = error instanceof Error ? error.message : "Something went wrong";
@@ -96,6 +144,7 @@ const TransactionForm = () => {
       });
     }
   };
+
   return (
     <form onSubmit={handleSubmit(handleSubmitUpdateTransaction)} className="b-sky-700 w-full max-w-xl">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="b-fuchsia-500 p-5 space-y-7">
@@ -187,7 +236,24 @@ const TransactionForm = () => {
             <InputField icon={<CiLocationOn size={19} />} type="text" placeholder="Location" name="location" propData={{ ...register("location") }} />
 
             <div className="relative b-amber-600">
-              <DatePicker selected={startDate} onChange={handleDateChange} timeInputLabel="Time:" dateFormat="yyyy/MM/dd" wrapperClassName="date-picker" />
+              {/* <DatePicker selected={transaction?.date ? new Date(Number(transaction.date)) : startDate} onChange={handleDateChange} timeInputLabel="Time:" dateFormat="yyyy/MM/dd" wrapperClassName="date-picker" /> */}
+
+              {/* use controller to handle date input without useState */}
+              <Controller
+                name="date"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    selected={field.value}
+                    onChange={(date) => {
+                      field.onChange(date);
+                      setStartDate(date);
+                    }}
+                    dateFormat="yyyy/MM/dd"
+                    wrapperClassName="date-picker"
+                  />
+                )}
+              />
 
               <CiCalendar size={22} className="absolute left-3 top-[15px] text-logo" />
 
@@ -202,7 +268,7 @@ const TransactionForm = () => {
             type="submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? <TbLoader scale={22} className="animate-spin mx-auto" /> : "Create Transaction"}
+            {isSubmitting ? <TbLoader scale={22} className="animate-spin mx-auto" /> : transaction ? "Update Transaction" : "Create Transaction"}
           </motion.button>
         </div>
       </motion.div>

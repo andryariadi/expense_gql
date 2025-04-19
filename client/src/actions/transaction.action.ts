@@ -1,8 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { CREATE_TRANSACTION, DELETE_TRANSACTION } from "@/graphql/mutations/transaction.mutation";
+import { CREATE_TRANSACTION, DELETE_TRANSACTION, UPDATE_TRANSACTION } from "@/graphql/mutations/transaction.mutation";
 import { getClient } from "@/libs/ApolloConfig";
+import { z } from "zod";
+import { TransactionFormValidation } from "@/libs/validations";
 
 export async function createTransactionAction(inputData: Record<string, unknown>) {
   try {
@@ -22,6 +24,37 @@ export async function createTransactionAction(inputData: Record<string, unknown>
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+export async function updateTransactionAction(transactionId: string, inputData: z.infer<typeof TransactionFormValidation>) {
+  try {
+    const client = await getClient();
+
+    const payload = {
+      ...inputData,
+      transactionId,
+    };
+
+    const { data } = await client.mutate({
+      mutation: UPDATE_TRANSACTION,
+      variables: { input: payload },
+    });
+
+    revalidatePath("/");
+
+    return {
+      success: true,
+      data: data.updateTransaction,
+      message: "Transaction updated successfully",
+    };
+  } catch (error) {
+    console.error("Update transaction action error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      message: "Failed to update transaction",
     };
   }
 }

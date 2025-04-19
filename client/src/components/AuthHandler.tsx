@@ -29,7 +29,7 @@ export function AuthHandler() {
         }
       }
       // Redirect ke login jika tidak login dan di protected page
-      else if (!isLoggedIn && !["/login", "/signup", "/"].includes(pathname)) {
+      else if (!isLoggedIn && !["/login", "/signup", "/"].includes(pathname) && !pathname.startsWith("/transaction")) {
         if (pathname !== "/login") {
           router.replace("/login");
         }

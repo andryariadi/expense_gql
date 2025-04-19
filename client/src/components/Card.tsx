@@ -15,16 +15,7 @@ import { formatDate } from "@/lib/utils";
 // import { DELETE_TRANSACTION } from "@/graphql/mutations/transaction.mutation";
 // import { useRouter } from "next/navigation";
 import ButtonDelete from "./ButtonDelete";
-
-type Transaction = {
-  _id: string;
-  description: string;
-  category: "Cash" | "Card";
-  paymentType: "Saving" | "Expense" | "Investment";
-  amount: number;
-  location: string;
-  date: string;
-};
+import { Transaction } from "@/types";
 
 const categoryColorMap = {
   Saving: "from-green-700 to-green-400",
@@ -49,7 +40,7 @@ const Card = ({ cardType, transaction }: { cardType: string; transaction: Transa
   //   },
   // });
 
-  // use this function if you want the component to be rendered on the client side
+  // // use this function if you want the component to be rendered on the client side
   // const handleDelete = async () => {
   //   try {
   //     const res = await deleteTransaction({
