@@ -1,20 +1,20 @@
-"use client";
+// "use client";
 
 import { FaLocationDot } from "react-icons/fa6";
 import { BsCardText } from "react-icons/bs";
 import { MdOutlinePayments } from "react-icons/md";
 import { FaSackDollar } from "react-icons/fa6";
-import { FaTrash } from "react-icons/fa";
 import { HiPencilAlt } from "react-icons/hi";
 import Link from "next/link";
 import Image from "next/image";
-import { formatDate, toastStyle } from "@/lib/utils";
-import toast from "react-hot-toast";
-import { TbLoader } from "react-icons/tb";
-import { deleteTransactionAction } from "@/actions/transaction.action";
+import { formatDate } from "@/lib/utils";
+// import { FaTrash } from "react-icons/fa";
+// import toast from "react-hot-toast";
+// import { TbLoader } from "react-icons/tb";
 // import { useMutation } from "@apollo/client";
 // import { DELETE_TRANSACTION } from "@/graphql/mutations/transaction.mutation";
 // import { useRouter } from "next/navigation";
+import ButtonDelete from "./ButtonDelete";
 
 type Transaction = {
   _id: string;
@@ -39,7 +39,6 @@ const Card = ({ cardType, transaction }: { cardType: string; transaction: Transa
   const formatedDate = formatDate(transaction.date);
 
   // const router = useRouter();
-
   // const [deleteTransaction, { loading }] = useMutation(DELETE_TRANSACTION, {
   //   // refetchQueries: ["GetTransactions"], // how to update client-side rendered data in real time
 
@@ -50,32 +49,31 @@ const Card = ({ cardType, transaction }: { cardType: string; transaction: Transa
   //   },
   // });
 
-  const handleDelete = async () => {
-    try {
-      // const res = await deleteTransaction({
-      //   variables: {
-      //     transactionId: transaction._id,
-      //   },
-      // });
+  // use this function if you want the component to be rendered on the client side
+  // const handleDelete = async () => {
+  //   try {
+  //     const res = await deleteTransaction({
+  //       variables: {
+  //         transactionId: transaction._id,
+  //       },
+  //     });
 
-      const res = await deleteTransactionAction(transaction._id);
+  //     console.log({ res }, "<---deleteTransaction");
 
-      console.log({ res }, "<---deleteTransaction");
+  //     if (res.data) {
+  //       toast.success("Transaction deleted successfully", {
+  //         style: toastStyle,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log(error, "<----errorTransactionForm");
+  //     const errorMessage = error instanceof Error ? error.message : "Something went wrong";
 
-      if (res.data) {
-        toast.success("Transaction deleted successfully", {
-          style: toastStyle,
-        });
-      }
-    } catch (error) {
-      console.log(error, "<----errorTransactionForm");
-      const errorMessage = error instanceof Error ? error.message : "Something went wrong";
-
-      toast.error(errorMessage, {
-        style: toastStyle,
-      });
-    }
-  };
+  //     toast.error(errorMessage, {
+  //       style: toastStyle,
+  //     });
+  //   }
+  // };
 
   // console.log({ cardType, transaction, formatedDate }, "<---cardTypeTransaction");
 
@@ -86,9 +84,12 @@ const Card = ({ cardType, transaction }: { cardType: string; transaction: Transa
           <h2 className="text-lg font-bold text-white">{transaction.category}</h2>
           <div className="flex items-center gap-2">
             {/* Button Delete */}
+
+            {/* If you use this button delete, the component will be rendered on the client side */}
             {/* {loading ? <TbLoader scale={22} className="animate-spin mx-auto" /> : <FaTrash className={"cursor-pointer"} onClick={handleDelete} />} */}
 
-            <FaTrash className={"cursor-pointer"} onClick={handleDelete} />
+            {/* If you use this button delete, the component will be rendered on the server side */}
+            <ButtonDelete transactionId={transaction._id} />
 
             {/* Button Edit */}
             <Link href={`/transaction/${transaction._id}`} className="flex items-center gap-2">
