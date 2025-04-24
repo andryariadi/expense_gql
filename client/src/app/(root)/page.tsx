@@ -2,6 +2,7 @@ import CardLists from "@/components/CardLists";
 import Chart from "@/components/Chart";
 import HeaderHome from "@/components/HeaderHome";
 import TransactionForm from "@/components/TransactionForm";
+import { GET_TRANSACTION_STATISTICS } from "@/graphql/queries/transaction.query";
 import { GET_AUTHENTICATED_USER, GET_USERS } from "@/graphql/queries/user.query";
 import { query } from "@/libs/ApolloConfig";
 // import { useQuery } from "@apollo/client";
@@ -22,6 +23,10 @@ export default async function Home() {
     query: GET_USERS,
   });
 
+  const { data: transactionStatistics } = await query({
+    query: GET_TRANSACTION_STATISTICS,
+  });
+
   // fetch data in Server Component use Axios
   // const data = await graphqlAxios(GET_AUTHENTICATED_USER);
 
@@ -30,7 +35,7 @@ export default async function Home() {
   // if (loading) return <p>Loading...</p>;
   // if (error) return <p>Error: {error.message}</p>;
 
-  console.log({ data, users }, "<----homePageee");
+  console.log({ data, users, transactionStatistics }, "<----homePageee");
 
   return (
     <main className="b-fuchsia-500 min-h-[calc(100vh-12rem)] flex  items-start justify-center">
@@ -41,7 +46,7 @@ export default async function Home() {
 
           {/* Chart and Form */}
           <div className="flex items-center gap-10">
-            <Chart />
+            <Chart transactionStatistics={transactionStatistics} />
 
             <TransactionForm />
           </div>

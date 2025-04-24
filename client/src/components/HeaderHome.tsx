@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { MdLogout } from "react-icons/md";
 
 const HeaderHome = () => {
-  const [logout, { loading }] = useMutation(LOGOUT, {
+  const [logout, { loading, client }] = useMutation(LOGOUT, {
     refetchQueries: ["GetAuthenticatedUser"],
   });
 
@@ -16,6 +16,9 @@ const HeaderHome = () => {
   const handleLogout = async () => {
     try {
       const res = await logout();
+
+      // Clear the Apollo Client cache
+      client.resetStore();
 
       if (res.data.logout.message) {
         router.refresh();
