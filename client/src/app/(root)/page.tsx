@@ -3,7 +3,7 @@ import Chart from "@/components/Chart";
 import HeaderHome from "@/components/HeaderHome";
 import TransactionForm from "@/components/TransactionForm";
 import { GET_TRANSACTION_STATISTICS } from "@/graphql/queries/transaction.query";
-import { GET_AUTHENTICATED_USER, GET_USERS } from "@/graphql/queries/user.query";
+import { GET_AUTHENTICATED_USER, GET_USER_AND_TRANSACTIONS } from "@/graphql/queries/user.query";
 import { query } from "@/libs/ApolloConfig";
 // import { useQuery } from "@apollo/client";
 // import { graphqlAxios } from "@/libs/graphqlAxios";
@@ -19,8 +19,9 @@ export default async function Home() {
   //   query: GET_AUTHENTICATED_USER,
   // }); // if you use getClient()
 
-  const { data: users } = await query({
-    query: GET_USERS,
+  const { data: userTransactions } = await query({
+    query: GET_USER_AND_TRANSACTIONS,
+    variables: { userId: data.authUser._id },
   });
 
   const { data: transactionStatistics } = await query({
@@ -35,14 +36,14 @@ export default async function Home() {
   // if (loading) return <p>Loading...</p>;
   // if (error) return <p>Error: {error.message}</p>;
 
-  console.log({ data, users, transactionStatistics }, "<----homePageee");
+  console.log({ data, userTransactions, transactionStatistics }, "<----homePageee");
 
   return (
     <main className="b-fuchsia-500 min-h-[calc(100vh-12rem)] flex  items-start justify-center">
       <div className="b-sky-500">
         <div className="b-rose-500 w-full max-w-5xl flex flex-col items-center gap-y-5">
           {/* Header */}
-          <HeaderHome />
+          <HeaderHome user={data} />
 
           {/* Chart and Form */}
           <div className="flex items-center gap-10">

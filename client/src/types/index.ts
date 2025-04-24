@@ -1,3 +1,12 @@
+export interface User {
+  authUser: {
+    _id: string;
+    username: string;
+    name: string;
+    profilePicture: string;
+  };
+}
+
 export interface Transaction {
   _id: string;
   description: string;

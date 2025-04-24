@@ -10,6 +10,7 @@ const userTypeDef = `#graphql
     password: String!
     profilePicture: String
     gender: String!
+    transactions: [Transaction!] # This is a relationship to the Transaction type
  }   #This is a User type
 
  type Query {

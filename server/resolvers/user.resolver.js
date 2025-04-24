@@ -1,3 +1,4 @@
+import Transaction from "../models/transaction.model.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 
@@ -106,6 +107,22 @@ const userResolver = {
         return { message: "Logged out successfully!" };
       } catch (error) {
         console.log(error, "<----logoutError");
+        throw new Error(error.message || "Internal server error!");
+      }
+    },
+  },
+
+  // this is the User type to get transactions that have a relationship to the user.
+  User: {
+    transactions: async (parent) => {
+      console.log({ parent }, "<---userTransactions");
+
+      try {
+        const transactions = await Transaction.find({ userId: parent._id });
+
+        return transactions;
+      } catch (error) {
+        console.log(error, "<----userTransactionsError");
         throw new Error(error.message || "Internal server error!");
       }
     },

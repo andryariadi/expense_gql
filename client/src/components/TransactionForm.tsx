@@ -58,7 +58,7 @@ const TransactionForm = ({ transaction }: { transaction?: Transaction }) => {
   });
 
   const [createTransaction] = useMutation(CREATE_TRANSACTION, {
-    // refetchQueries: ["GetTransactions"], // how to update client-side rendered data in real time
+    // refetchQueries: ["GetTransactions", "GetCategoryStatistics"], // how to update client-side rendered data in real time
 
     // how to update server-side rendered data in real time
     onCompleted: () => {
@@ -68,7 +68,7 @@ const TransactionForm = ({ transaction }: { transaction?: Transaction }) => {
   });
 
   const [updateTransaction] = useMutation(UPDATE_TRANSACTION, {
-    // refetchQueries: ["GetTransactions"], // how to update client-side rendered data in real time
+    // refetchQueries: ["GetTransactions", "GetCategoryStatistics"], // how to update client-side rendered data in real time
 
     // how to update server-side rendered data in real time
     onCompleted: () => {

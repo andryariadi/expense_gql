@@ -31,7 +31,7 @@ const Card = ({ cardType, transaction }: { cardType: string; transaction: Transa
 
   // const router = useRouter();
   // const [deleteTransaction, { loading }] = useMutation(DELETE_TRANSACTION, {
-  //   // refetchQueries: ["GetTransactions"], // how to update client-side rendered data in real time
+  //   // refetchQueries: ["GetTransactions", "GetCategoryStatistics"], // how to update client-side rendered data in real time
 
   //   // how to update server-side rendered data in real time
   //   onCompleted: () => {
