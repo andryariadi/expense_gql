@@ -120,6 +120,8 @@ const userResolver = {
       try {
         const transactions = await Transaction.find({ userId: parent._id });
 
+        console.log({ transactions }, "<---userTransactions2");
+
         return transactions;
       } catch (error) {
         console.log(error, "<----userTransactionsError");

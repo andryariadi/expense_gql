@@ -1,25 +1,25 @@
-"use client";
+// "use client";
 
-// import { query } from "@/libs/ApolloConfig";
+import { query } from "@/libs/ApolloConfig";
 import Card from "./Card";
 import { GET_TRANSACTIONS } from "@/graphql/queries/transaction.query";
 import { Transaction } from "@/types";
-import { useQuery } from "@apollo/client";
+// import { useQuery } from "@apollo/client";
 
-const CardLists = () => {
-  // const { data, loading, error } = await query({
-  //   query: GET_TRANSACTIONS,
-  // });
+const CardLists = async () => {
+  const { data, loading, error } = await query({
+    query: GET_TRANSACTIONS,
+  });
 
-  // if (loading) return <p>Loading...</p>;
-  // if (error) return <p>Error: {error.message}</p>;
-
-  // console.log({ loading, error, data }, "<---CardListsData");
-
-  // fetch data in Client Component use Apollo Client
-  const { loading, data, error } = useQuery(GET_TRANSACTIONS);
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
+
+  console.log({ loading, error, data }, "<---CardListsData");
+
+  // fetch data in Client Component use Apollo Client
+  // const { loading, data, error } = useQuery(GET_TRANSACTIONS);
+  // if (loading) return <p>Loading...</p>;
+  // if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div className="w-full px-10 min-h-[40vh]">

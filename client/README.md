@@ -1,3 +1,6 @@
+WARNING ! ! ! :
+If the data is fetched on the client side, the CUD mutation must also use the client side function, and vice versa, if the data is fetched on the server side, the CUD mutation must use the server side function.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
